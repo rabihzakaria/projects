@@ -1,6 +1,6 @@
 package com.fabrick.bank.dtos;
 
-import com.fabrick.bank.models.Balance;
+import com.fabrick.bank.models.Payload;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,11 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BalanceResponse implements Serializable {
-
+public class BaseResponse<T> implements Serializable {
 	private String      status;
 
-	private List<Error> error;
+	private List<String> error;
 
-	private Balance     payload;
+	private T payload;
 }

@@ -10,17 +10,7 @@ import java.util.Date;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Account implements Serializable {
-	private String accountID;
-	private String iban;
-	private String abiCode;
-	private String cabCode;
-	private String countryCode;
-	private String internationalCin;
-	private String nationalCin;
-	private String account;
-	private String alias;
-	private String productName;
-	private String holderName;
-	private Date   activatedDate;
-	private String currency;
+
+	private String accountCode;
+	private String bicCode;
 }

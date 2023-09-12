@@ -1,4 +1,4 @@
-package com.fabrick.bank.dtos;
+package com.fabrick.bank.models;
 
 import com.fabrick.bank.models.AmountInfo;
 import com.fabrick.bank.models.Client;
@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MoneyTransferResponse {
+public class MoneyTransfer {
 	private String    moneyTransferId;
 	private String    status;
 	private String    direction;

@@ -1,6 +1,6 @@
 package com.fabrick.bank.config;
 
-import com.fabrick.bank.utils.LogInterceptor;
+import com.fabrick.bank.utils.	LogInterceptor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

@@ -1,7 +1,6 @@
 package com.fabrick.bank.errors;
 
 import com.fabrick.bank.models.Error;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +11,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 	@Autowired
-	private                       HttpServletRequest request;
+	private                HttpServletRequest request;
 	private   static final Logger             LOGGER = LoggerFactory.getLogger(RestResponseEntityExceptionHandler.class);
 	@ExceptionHandler(HttpClientErrorException.class)
 	public ResponseEntity<Object> handleHttpClientErrorException(HttpClientErrorException ex) {

@@ -6,6 +6,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -33,7 +34,7 @@ public class LogInterceptor implements ClientHttpRequestInterceptor {
 		logger.info("=========================== Response ===========================");
 		logger.info("Status code  : {}", response.getStatusCode());
 		logger.info("Headers      : {}", response.getHeaders());
-		String responseBody = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
+		String responseBody = new String(StreamUtils.copyToByteArray(response.getBody()));
 		logger.info("Response body: {}", responseBody);
 		logger.info("===============================================================");
 	}
