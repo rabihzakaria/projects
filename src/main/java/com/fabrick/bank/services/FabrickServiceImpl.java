@@ -10,10 +10,10 @@ import com.fabrick.bank.models.Transactions;
 import com.fabrick.bank.repository.TransactionRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -35,22 +38,35 @@ public class FabrickServiceImpl implements FabrickService {
 	private final ObjectMapper          objectMapper = new ObjectMapper();
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	private final CloseableHttpClient httpClient;
 
 	@Autowired
-	public FabrickServiceImpl(FabrickApiConfig fabrickApiConfig, TransactionRepository transactionRepository) {
+	public FabrickServiceImpl(FabrickApiConfig fabrickApiConfig, TransactionRepository transactionRepository, CloseableHttpClient httpClient) {
 		this.baseUrl = fabrickApiConfig.getFabrickUrl();
 		this.headers = fabrickApiConfig.fabrickApiHeaders();
 		this.transactionRepository = transactionRepository;
-
+		this.httpClient = httpClient;
 	}
 
 	private <T> BaseResponse<T> executeHttpRequest(HttpUriRequest request, TypeReference<BaseResponse<T>> responseType) {
-		try (CloseableHttpClient httpClient = HttpClients.createDefault();
-				CloseableHttpResponse response = httpClient.execute(request)) {
+		try {
+			CloseableHttpResponse response = httpClient.execute(request);
 			int statusCode = response.getStatusLine().getStatusCode();
 			if (statusCode == 200) {
-				String responseBody = EntityUtils.toString(response.getEntity());
-				return objectMapper.readValue(responseBody, responseType);
+				HttpEntity entity = response.getEntity();
+				if (entity != null) {
+					// Read the response body once into a string
+					String responseBody = EntityUtils.toString(entity, StandardCharsets.UTF_8);
+
+					try {
+						// Use the pre-read response body to deserialize it
+						return objectMapper.readValue(responseBody, responseType);
+					} catch (IOException e) {
+						log.error("Error deserializing response body", e);
+					}
+				} else {
+					log.error("Empty response body");
+				}
 			} else {
 				log.error("HTTP Request failed with status code: " + statusCode);
 			}
@@ -59,6 +75,8 @@ public class FabrickServiceImpl implements FabrickService {
 		}
 		return null;
 	}
+
+
 
 	@Override
 	public BaseResponse<Balance> getBalance(String accountId) {

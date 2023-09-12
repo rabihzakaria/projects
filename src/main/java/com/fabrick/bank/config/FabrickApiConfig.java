@@ -1,15 +1,18 @@
 package com.fabrick.bank.config;
 
-import com.fabrick.bank.utils.	LogInterceptor;
+import com.fabrick.bank.utils.LogInterceptor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,16 +31,16 @@ import org.springframework.web.client.RestTemplate;
 	private String fabrickApiPath;
 
 	@Bean
-	public ClientHttpRequestInterceptor loggingInterceptor() {
+	public HttpRequestInterceptor loggingInterceptor() {
 		return new LogInterceptor();
 	}
+
 	@Bean
-	public RestTemplate restTemplate() {
-		RestTemplate restTemplate = new RestTemplate();
-		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-		restTemplate.getMessageConverters().add(converter);
-		restTemplate.getInterceptors().add(loggingInterceptor());
-		return restTemplate;
+	public CloseableHttpClient closeableHttpClient() {
+		return HttpClients.custom()
+				.addInterceptorFirst((HttpRequestInterceptor) new LogInterceptor())
+				.addInterceptorLast((HttpResponseInterceptor) new LogInterceptor()) // Add your LogInterceptor
+				.build();
 	}
 
 	@Bean
